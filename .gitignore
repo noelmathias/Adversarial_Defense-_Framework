@@ -1,0 +1,33 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+
+# Data (ignore all contents)
+data/*
+!data/.gitkeep
+
+# Model weights
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.h5
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
