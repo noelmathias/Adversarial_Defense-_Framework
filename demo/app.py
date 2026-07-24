@@ -43,7 +43,15 @@ from demo.utils import (
     RISK_LOW_THRESHOLD,
     RISK_MEDIUM_THRESHOLD,
 )
+# OLD import
 from models.cnn import DefenseCNN
+
+# NEW import
+from models.resnet import ResNet18 as DefenseCNN
+
+
+# NEW
+
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -80,7 +88,7 @@ model, device = load_model()
 st.title("🛡️ Agentic Defense Framework")
 st.caption(
     "Adversarial Attack Detection & Adaptive Defense · Phase 2 Demo · "
-    f"Device: `{device}` · Model: `DefenseCNN (CIFAR-10)`"
+    f"Device: `{device}` · Model: `ResNet-18 (CIFAR-10)`"
 )
 st.divider()
 
@@ -899,7 +907,7 @@ else:
 # ── Footer ─────────────────────────────────────────────────────────────────────
 st.divider()
 st.caption(
-    f"Model: DefenseCNN · Device: `{device}` · "
+    f"Model: ResNet-18 · Device: `{device}` · "
     "Attacks: FGSM / PGD · "
     "Detection: 5-signal (conf, entropy, conf_drop, **noise_entropy**, mismatch) · "
     "Defense: Light / Medium / Strong (randomized smoothing) · "

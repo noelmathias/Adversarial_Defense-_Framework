@@ -13,7 +13,7 @@ in the returned dict for any downstream code that still reads the old key.
 Run:
     python experiments/pgd_analysis.py
 """
-
+from models.resnet import ResNet18 as DefenseCNN
 import sys
 import os
 import json
@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.cnn import DefenseCNN
+from models.resnet import ResNet18 as DefenseCNN
 from utils.data_loader import get_cifar10_loaders
 from attacks import ATTACK_REGISTRY
 from defense.defenses import (

@@ -1,3 +1,19 @@
+# models/cnn.py
+"""
+Backward-compatibility shim.
+
+All existing imports of the form:
+    from models.cnn import DefenseCNN
+continue to resolve correctly to ResNet18.
+
+Do not put any logic here. The canonical implementation is models/resnet.py.
+"""
+
+from models.resnet import ResNet18 as DefenseCNN  # noqa: F401
+
+__all__ = ["DefenseCNN"]
+'''
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -78,3 +94,4 @@ class DefenseCNN(nn.Module):
         x = x.view(x.size(0), -1)   # flatten
         x = F.relu(self.bn7(self.fc1(x))) #penultimate layer features
         return x                    # (B, D)
+'''
