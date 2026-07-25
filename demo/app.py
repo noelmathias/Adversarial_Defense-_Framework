@@ -80,6 +80,7 @@ def load_model():
         st.stop()
     model.load_state_dict(torch.load(ckpt, map_location=device))
     model.eval()
+    print("Loading model...", ckpt)
     return model, device
 
 model, device = load_model()
@@ -245,7 +246,9 @@ else:
                 f"**Confidence:** {icon} "
                 f"`{clean_conf*100:.1f}% → {adv_conf*100:.1f}%`"
             )
-            if abs(delta) > 0.4:    st.error("Threat Level: HIGH")
+            if success: 
+                st.error("Threat Level: HIGH")
+            elif abs(delta) > 0.4:    st.error("Threat Level: HIGH")
             elif abs(delta) > 0.15: st.warning("Threat Level: MEDIUM")
             else:                   st.success("Threat Level: LOW")
 

@@ -278,6 +278,16 @@ def compute_risk_score(
 
     risk_score = float(np.clip(risk_score, 0.0, 1.0))
 
+    print("\n===DETECTOR DEBUG===")
+    print(f"Risk Score: {risk_score:.4f}")
+    print(f"Confidence: {adv_confidence:.4f}")
+    print(f"Entropy (Normalized): {entropy_norm:.4f}")
+    print(f"Confidence Drop: {conf_drop:.4f}")
+    print(f"Prediction Mismatch: {pred_mismatch}")
+    print(f"Unstable: {unstable}")
+    print(f"Noise Entropy: {noise_entropy_val:.4f}")
+    print("====================\n")
+
     return {
         "confidence":    adv_confidence,
         "entropy_raw":   raw_entropy,
