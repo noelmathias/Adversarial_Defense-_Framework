@@ -1,0 +1,25 @@
+{
+  "title": "Recurring Model-Version-Aware Adaptive DA-LinTS State Management",
+  "status": "preregistered_design_not_executed",
+  "relationship_to_completed_study": "Separate recurrence study; it does not modify or rerun the completed one-way study.",
+  "seeds": [20260821, 20260822, 20260823, 20260824, 20260825, 20260826, 20260827, 20260828, 20260829, 20260830],
+  "phases": [
+    {"id": "A", "environment_model": "standard", "checkpoint": "checkpoints/cnn_best.pth", "checkpoint_sha256": "e548c7a95c030a206f5b1da6620209ef67b77dee90f1fe33b8200a3deb09caf8", "episodes": 100},
+    {"id": "B", "environment_model": "robust_alone", "checkpoint": "checkpoints/robust_best.pth", "checkpoint_sha256": "cf518eff5c283a967d376b12d0765daa4c5d82dc3d5f9d681b5a9d892299c4d3", "episodes": 100},
+    {"id": "C", "environment_model": "standard", "checkpoint": "checkpoints/cnn_best.pth", "checkpoint_sha256": "e548c7a95c030a206f5b1da6620209ef67b77dee90f1fe33b8200a3deb09caf8", "episodes": 100},
+    {"id": "D", "environment_model": "robust_alone", "checkpoint": "checkpoints/robust_best.pth", "checkpoint_sha256": "cf518eff5c283a967d376b12d0765daa4c5d82dc3d5f9d681b5a9d892299c4d3", "episodes": 100}
+  ],
+  "policies": ["full_reset", "version_indexed_learner_state_isolation"],
+  "manifest_protocol": "One fixed 400-episode manifest per seed, generated before either policy; image indices, attacks, epsilons, torch episode randomness, and fresh-state sampling seeds are matched.",
+  "recurrence": {
+    "sequence": "standard -> robust_alone -> standard -> robust_alone",
+    "first_visits": ["A standard", "B robust_alone"],
+    "restorations": ["C restores standard state accumulated in A", "D restores robust_alone state accumulated in B"]
+  },
+  "frozen_controls": ["DA-LinTS mathematics and hyperparameters", "three-action space", "reward", "risk", "attacks and severity", "defenses", "thresholds", "checkpoints", "evaluation/logging", "CUSUM configuration", "posterior-discount path", "dataset handling", "runtime environment"],
+  "primary_endpoint": "Phase-D mean reward: isolation minus full_reset per seed",
+  "secondary_endpoint": "Phase-C paired metrics under restored standard state",
+  "equality_gates": ["Phase A exact equality before B", "Phase B exact equality before C"],
+  "advance_version_isolation_only_if": ["mean Phase-D reward difference > 0", "at least 8 of 10 positive Phase-D reward differences", "mean Phase-D post-risk difference <= 0", "mean Phase-D recovery and defended-accuracy differences >= 0", "all integrity audits pass"],
+  "significance_statement": "No statistical-significance claim is made from 10 seeds."
+}

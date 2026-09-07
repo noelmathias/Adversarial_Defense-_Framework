@@ -1,0 +1,81 @@
+{
+  "title": "Model-Version-Aware Adaptive DA-LinTS State Management",
+  "status": "design_only_preregistration",
+  "research_question": "When an explicitly observed classifier/model version changes, does version-indexed DA-LinTS state isolation improve Phase-B adaptive-defense performance relative to full Phase-B reset?",
+  "motivation": {
+    "continuous_state_result": "Three matched seeds were worse than full reset on Phase-B reward and post-defense risk for all seeds; no significance claim was made.",
+    "partial_reset_result": "The pre-registered fixed 50% partial reset did not justify replacing full reset.",
+    "implementation_inspection": "The active learned posterior is represented only by per-arm B and f sufficient statistics. Posterior caches are derived. Serialized auxiliary state includes RNG, CUSUM, aggregates, and timestamps.",
+    "design_implication": "There is no pre-existing robust_alone state before this one-way transition; transferring or shrinking standard state would be ungrounded."
+  },
+  "hypotheses": {
+    "primary": "Version-indexed state isolation has a positive paired Phase-B mean-reward difference versus full reset and satisfies all safety and integrity gates.",
+    "null_negative": "The intervention fails one or more advancement gates. An exact tie is an expected valid negative result for a first exposure to robust_alone because its active state starts at the same prior as full reset.",
+    "significance_statement": "No statistical-significance claim will be made solely from these 10 seeds."
+  },
+  "baseline": {
+    "name": "full_phase_b_reset",
+    "boundary_action": "Replace the Phase-A local learner with a fresh unchanged DA-LinTS learner immediately before Phase B.",
+    "initial_posterior": "For every arm, B=lambda*I and f=0."
+  },
+  "intervention": {
+    "name": "version_indexed_learner_state_isolation",
+    "count": 1,
+    "description": "Freeze the complete standard learner state in an experiment-local registry and activate the robust_alone partition. A missing version partition is initialized at the ordinary prior; inactive state is never merged, sampled, updated, or discounted.",
+    "scientific_rationale": "It invalidates all model-dependent posterior information instead of selecting another arbitrary shrinkage percentage, while preserving version provenance for a future separately preregistered recurrence design.",
+    "first_transition_consequence": "robust_alone has no stored state, so its active Phase-B posterior is exactly the full-reset prior when random streams are coupled."
+  },
+  "state_definition": {
+    "per_version": "L_v=({B_v_a,f_v_a}_a,R_v,D_v,G_v)",
+    "posterior": "mu_v_a=inv(B_v_a) f_v_a; Sigma_v_a=sigma_sq inv(B_v_a)",
+    "derived_cache_policy": "Caches are regenerated from B and f and never transferred independently.",
+    "boundary": {
+      "timing": "After Phase-A episode 100 and before Phase-B episode 101.",
+      "operations": [
+        "registry[standard]=L_standard^(100)",
+        "L_robust_alone^(0)=({lambda*I,0}_a,R_B,D_0,G_0)",
+        "active=L_robust_alone^(0)"
+      ],
+      "prohibited_transfer": "No standard-state value may enter active Phase-B B, f, posterior cache, CUSUM, RNG, or diagnostics."
+    }
+  },
+  "protocol": {
+    "seeds": [20260821, 20260822, 20260823, 20260824, 20260825, 20260826, 20260827, 20260828, 20260829, 20260830],
+    "phase_a": {"episodes": 100, "environment_model": "standard", "checkpoint": "checkpoints/cnn_best.pth", "checkpoint_sha256": "e548c7a95c030a206f5b1da6620209ef67b77dee90f1fe33b8200a3deb09caf8"},
+    "phase_b": {"episodes": 100, "environment_model": "robust_alone", "checkpoint": "checkpoints/robust_best.pth", "checkpoint_sha256": "cf518eff5c283a967d376b12d0765daa4c5d82dc3d5f9d681b5a9d892299c4d3"},
+    "transition": "standard -> robust_alone",
+    "actions": ["light", "medium", "strong"],
+    "manifest_protocol": "One fixed 200-episode manifest per seed, created before either policy runs and shared by policies. Image indices, attacks, epsilons, torch randomness, and Phase-B sampling stream are matched per seed.",
+    "fixed_controls": ["DA-LinTS equations and hyperparameters", "reward", "risk computation", "attack generation and severity", "defenses", "thresholds", "checkpoints", "evaluation", "logging", "CUSUM implementation/configuration", "posterior-discount implementation", "dataset handling", "runtime environment"]
+  },
+  "metrics": {
+    "primary": "d_s=mean_reward_PhaseB(intervention,s)-mean_reward_PhaseB(full_reset,s)",
+    "primary_reporting": ["per-seed full-reset reward", "per-seed intervention reward", "per-seed d_s", "mean", "sample standard deviation", "minimum", "maximum", "positive count", "negative count", "tie count"],
+    "secondary": ["recovery rate", "defended accuracy", "mean pre-defense risk", "mean post-defense risk", "risk reduction", "selected-arm distributions", "posterior diagnostics", "CUSUM events", "posterior-discount events", "learner update counts", "runtime"],
+    "reporting_rule": "Report episode-level and per-seed data; do not rely solely on aggregate means. Lower-is-better differences state their direction explicitly."
+  },
+  "advancement_rule": {
+    "all_required": true,
+    "conditions": [
+      "mean(d_s)>0",
+      "count(d_s>0)>=8 of 10",
+      "mean(post_defense_risk_intervention-post_defense_risk_full_reset)<=0",
+      "mean(recovery_intervention-recovery_full_reset)>=0",
+      "mean(defended_accuracy_intervention-defended_accuracy_full_reset)>=0",
+      "No implementation-integrity or pathological-detector failure occurs."
+    ],
+    "failure_rule": "If any condition fails, full Phase-B reset remains the baseline and the outcome is a valid negative result.",
+    "integrity_gate": "Matched manifests/checkpoints/config; 100 active Phase-B updates per policy per seed; prior-only active robust B/f at boundary; unchanged detector/discount path; validated artifacts."
+  },
+  "cusum": {
+    "role": "secondary diagnostic only; not a model-version detector or primary signal",
+    "residual": "(r_t-mu_a^T phi_t)/sqrt(sigma_sq+phi_t^T Sigma_a phi_t)",
+    "configuration_unchanged": {"kappa": 0.5, "threshold": 5.0, "forgetting_factor": 0.95},
+    "logging": ["CUSUM events", "posterior discounts"],
+    "interpretation": "Alarms are not required and no claim may state that CUSUM detected the version change."
+  },
+  "reproducibility_and_artifacts": ["immutable preregistration copies", "resolved configuration", "manifests and hashes", "checkpoint hashes", "source/revision and environment metadata", "command record", "episode-level records", "boundary-state audit", "policy summaries", "paired report", "all raw logs and unfavorable artifacts"],
+  "forbidden_after_preregistration": ["post-hoc tuning", "new reset percentages", "parameter sweeps", "result-selected intervention", "changing reward/risk/attacks/attack severity/defenses/thresholds/equations/actions/checkpoints/evaluation/logging", "changing CUSUM kappa/threshold/startup/cooldown/discount", "new transition to force CUSUM", "cherry-picking or selectively rerunning seeds", "deleting or hiding unfavorable artifacts", "changing advancement criteria"],
+  "scope": {"experiment_run": false, "production_code_change": false, "streamlit_change": false},
+  "expected_contribution": "Separates known version boundaries from residual-drift detection and tests a provenance-safe state lifecycle without inventing posterior transfer. A tie establishes that partitioning is not evidence of transfer benefit on a first one-way transition; reuse on recurrence requires a separate preregistered study."
+}

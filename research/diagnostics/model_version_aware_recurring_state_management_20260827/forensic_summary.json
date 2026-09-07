@@ -1,0 +1,37 @@
+{
+  "source_run": "results\\model_version_aware_recurring_state_management_full_20260827T134710Z",
+  "artifact_verification": {
+    "required_root_files_present": true,
+    "seed_count": 10,
+    "policy_count": 2,
+    "episode_csv_count": 20,
+    "boundary_audit_count": 20,
+    "all_phase_counts_100": true,
+    "raw_phase_A_B_exact": true
+  },
+  "phase_d_recomputed": {
+    "reward_difference": {
+      "mean": 0.0004766829783344639,
+      "median": 0.001114471642050141,
+      "sample_standard_deviation": 0.006487751925539607,
+      "minimum": -0.008992293986658018,
+      "maximum": 0.009700457378369165,
+      "positive_count": 5,
+      "negative_count": 5,
+      "tie_count": 0
+    },
+    "recovery_difference_mean": -0.0010000000000000009,
+    "accuracy_difference_mean": -0.0010000000000000009,
+    "post_risk_difference_mean": -0.0001981093460999478
+  },
+  "restoration": {
+    "all_B_hashes_equal_D_active_hashes": true,
+    "all_D_restore_hash_checks": true,
+    "all_D_isolation_modes_restored": true,
+    "all_D_full_reset_modes_fresh": true
+  },
+  "limitations": [
+    "Artifacts retain full-state hashes and cache/prior audit booleans, but not numeric B/f matrices or serialized RNG/CUSUM payloads; their magnitudes cannot be independently quantified post hoc.",
+    "CSV posterior fields are only selected-arm projections/uncertainty, not complete per-arm state."
+  ]
+}
